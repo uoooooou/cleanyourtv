@@ -56,6 +56,11 @@
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <!-- Show the app in standard Android launchers/app drawers. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
             <!-- Listed in the TV's own app list, so it can be opened from the stock home screen too. -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
