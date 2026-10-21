@@ -1,8 +1,6 @@
 name: Build CleanYourTV Launcher
 on:
-  workflow_dispatch: # 手动触发，浏览器点按钮编译（推荐）
-  push:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,13 +10,26 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # ========== 手动安装 Android SDK，不再用有bug的 android-actions/setup-android ==========
+      - name: Install Android SDK Cmdline Tools
+        run: |
+          sudo apt update && sudo apt install -y unzip
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk/cmdline-tools
+          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+
+      - name: Accept SDK Licenses & Install Platform 34 + Build Tools
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
       - name: Build Launcher
         working-directory: ./launcher
